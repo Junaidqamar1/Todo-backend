@@ -2,19 +2,19 @@ const Task = require("../models/Task");
 const Action = require("../models/Action");
 const User = require("../models/User"); // Ensure this is imported
 
-// CREATE Task
+
 const createTask = async (req, res) => {
   try {
     const task = new Task(req.body);
     await task.save();
 
-    // 🔍 Get user info for logging
+ 
     const user = await User.findById(req.body.assignedTo);
 
-    // ✅ Populate assigned user for frontend
+ 
     const populatedTask = await task.populate("assignedTo", "username email");
 
-    // 📝 Log the action
+
     const action = await Action.create({
       user: req.body.assignedTo,
       task: task._id,
@@ -24,7 +24,7 @@ const createTask = async (req, res) => {
 
     const io = req.app.get("io");
 
-    // ✅ Emit fully populated task
+ 
     io.emit("task-created", populatedTask);
     io.emit("new-action", action);
 
@@ -36,7 +36,7 @@ const createTask = async (req, res) => {
 };
 
 
-// GET All Tasks
+
 const getTasks = async (req, res) => {
   try {
     const tasks = await Task.find().populate("assignedTo", "username email");
@@ -46,7 +46,6 @@ const getTasks = async (req, res) => {
   }
 };
 
-// UPDATE Task
 const updateTask = async (req, res) => {
   try {
     const clientTime = new Date(req.body.lastModified);
@@ -80,7 +79,7 @@ const updateTask = async (req, res) => {
 
 
 
-// DELETE Task
+
 const deleteTask = async (req, res) => {
   try {
     console.log("hitted");
